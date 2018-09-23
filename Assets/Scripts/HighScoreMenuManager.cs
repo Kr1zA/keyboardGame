@@ -44,7 +44,7 @@ public class HighScoreMenuManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Return) && HighScoreMenu.activeSelf && !_enterPressed &&
             _actualBestScorePosition != -1)
         {
-            NewHighScoreNameEntered();
+       NewHighScoreNameEntered();
         }
     }
 
@@ -108,6 +108,9 @@ public class HighScoreMenuManager : MonoBehaviour
                     transform.rotation);
                 _if.transform.SetParent(HighScoreMenu.transform);
                 _if.GetComponent<InputField>().text = "Enter your name!";
+                //not working because enter in pause menu script...
+//                _if.GetComponent<InputField>().onEndEdit.AddListener(delegate {NewHighScoreNameEntered(); });
+                _if.GetComponent<InputField>().Select();
             }
             else
             {
@@ -154,24 +157,25 @@ public class HighScoreMenuManager : MonoBehaviour
         newGame.transform.GetComponentInChildren<Text>().text = "New Game";
         newGame.transform.SetParent(HighScoreMenu.transform);
 
+
+//#if UNITY_EDITOR
+//        UnityEditor.Events.UnityEventTools.RegisterPersistentListener(newGame.GetComponent<Button>().onClick, 0,
+//            DestroyHighScoreTable
+//        );
+//#endif
+//
+//#if UNITY_EDITOR
+//        UnityEditor.Events.UnityEventTools.AddPersistentListener(newGame.GetComponent<Button>().onClick,
+//            GameManager.Instance.BeginTrainingGame
+//        );
+//#endif
         
-#if UNITY_EDITOR
-        UnityEditor.Events.UnityEventTools.RegisterPersistentListener(newGame.GetComponent<Button>().onClick, 0,
-            DestroyHighScoreTable);
-#endif
+        newGame.GetComponent<Button>().onClick.AddListener(DestroyHighScoreTable);
+        newGame.GetComponent<Button>().onClick.AddListener(GameManager.Instance.BeginTrainingGame);
 
-#if UNITY_EDITOR
-        UnityEditor.Events.UnityEventTools.AddPersistentListener(newGame.GetComponent<Button>().onClick,
-            GameManager.Instance.BeginTrainingGame
-        );
-#endif
-
-        //newGame.GetComponent<Button>().onClick.AddListener(DestroyHighScoreTable);
-
-        //newGame.GetComponent<Button>().onClick.AddListener(GameManager.Instance.BeginTrainingGame);
-        GetComponent<PauseMenu>().HighScoreMenuButtons[0] = newGame;
-        GetComponent<PauseMenu>().SetUsingButtons = GetComponent<PauseMenu>().HighScoreMenuButtons;
-        GetComponent<PauseMenu>().ChangeStateOfPointers(true);
+        PauseMenu.Instance.HighScoreMenuButtons[0] = newGame;
+        PauseMenu.Instance.SetUsingButtons = PauseMenu.Instance.HighScoreMenuButtons;
+        PauseMenu.Instance.ChangeStateOfPointers(true);
     }
 
     private GameObject CreateUIGameOverTextObject(GameObject toCreate, float x, float y, string text)
@@ -218,7 +222,7 @@ public class HighScoreMenuManager : MonoBehaviour
     public void DestroyHighScoreTable()
     {
         _enterPressed = false;
-        GetComponent<PauseMenu>().ChangeStateOfPointers(false);
+        PauseMenu.Instance.ChangeStateOfPointers(false);
         for (int i = 0; i < HighScoreMenu.transform.childCount; i++)
         {
             Destroy(HighScoreMenu.transform.GetChild(i).gameObject);

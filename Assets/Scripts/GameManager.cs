@@ -218,10 +218,11 @@ public class GameManager : MonoBehaviour
 
     private void TrainingGame()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !HighScoreMenuManager.Instance.HighScoreMenu.activeSelf && !_inGame)
         {
             _inGame = true;
             Destroy(_startGameText);
+            return;
         }
 
         if (_inGame)
@@ -246,8 +247,9 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            if (Input.anyKey)
+            if (Input.anyKeyDown)
             {
+                bool pressedWrongButton = true;
                 foreach (GameObject alpha in _fallingAlphas)
                 {
                     if (Input.GetKeyDown(alpha.name.ToLower().Substring(0, 1)))
@@ -256,8 +258,16 @@ public class GameManager : MonoBehaviour
                         _scoreText.GetComponent<TextMesh>().text = "" + _score;
                         Instantiate(LightOnKey, GetPositionOfPressedAlpha(alpha), transform.rotation);
                         RemoveFallingAlpha(alpha, false);
+                        pressedWrongButton = false;
                         break;
                     }
+                }
+
+                if (pressedWrongButton)
+                {
+                    Instantiate(BadParticles, _livesText.transform.position, Quaternion.identity).transform.parent =
+                        _parent.transform;
+                    LoseLife();
                 }
             }
         }

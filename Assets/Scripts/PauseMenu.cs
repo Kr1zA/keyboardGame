@@ -14,6 +14,8 @@ public class PauseMenu : MonoBehaviour
 
     public GameObject Pointer;
 
+    public static PauseMenu Instance;
+
     private int _index = 1;
     private GameObject _leftPointer;
     private GameObject _rightPointer;
@@ -32,6 +34,13 @@ public class PauseMenu : MonoBehaviour
         PauseMenuButtons[0].SetActive(false);
         _firtsRun = true;
         PauseMenuUI.SetActive(true);
+        
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+        }
+
+        Instance = this;
     }
 
     // Update is called once per frame
