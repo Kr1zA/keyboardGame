@@ -95,7 +95,6 @@ public class PauseMenu : MonoBehaviour
                 if (GameMenuUI.activeSelf)
                 {
                     Back();
-                    ChangePositionOfPointer();
                 }
                 else
                 {
@@ -105,7 +104,6 @@ public class PauseMenu : MonoBehaviour
             else
             {
                 Pause();
-                ChangePositionOfPointer();
             }
         }
     }
@@ -123,10 +121,13 @@ public class PauseMenu : MonoBehaviour
 
     void Pause()
     {
-        GameManager.Instance.MenuOpened = true;
-        ChangeStateOfPointers(true);
-        PauseMenuUI.SetActive(true);
-        Time.timeScale = 0f;
+        if (!_firtsRun)
+        {
+            GameManager.Instance.MenuOpened = true;
+            ChangeStateOfPointers(true);
+            PauseMenuUI.SetActive(true);
+            Time.timeScale = 0f;
+        }
     }
 
     public void QuitGame()
