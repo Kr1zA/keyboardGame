@@ -44,7 +44,7 @@ public class HighScoreMenuManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Return) && HighScoreMenu.activeSelf && !_enterPressed &&
             _actualBestScorePosition != -1)
         {
-       NewHighScoreNameEntered();
+            NewHighScoreNameEntered();
         }
     }
 
@@ -67,7 +67,7 @@ public class HighScoreMenuManager : MonoBehaviour
                 points.GetComponent<Text>().alignment = TextAnchor.MiddleRight;
             }
 
-            GameObject gameOver = CreateUIGameOverTextObject(GameText, 0.5f, 0.3f, "Your score is: " + score);
+            GameObject gameOver = CreateUIGameOverTextObject(GameText, 0.5f, 0.35f, "Your score is: " + score);
             gameOver.GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
 
             CreateNewGameButton();
@@ -139,24 +139,18 @@ public class HighScoreMenuManager : MonoBehaviour
         newName.GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
 
         SaveScoreTableToFile();
-
+        
         CreateNewGameButton();
-    }
-
-    private void Daco()
-    {
-        Debug.Log("nasrac");
     }
 
     private void CreateNewGameButton()
     {
         GameObject newGame = Instantiate(Button, new Vector2(
-            GameManager.Instance.GameCamera.ViewportToScreenPoint(new Vector3(0.5f, 0.1f, 0)).x,
-            GameManager.Instance.GameCamera.ViewportToScreenPoint(new Vector3(0.5f, 0.1f, 0)).y), transform.rotation);
+            GameManager.Instance.GameCamera.ViewportToScreenPoint(new Vector3(0.5f, 0.28f, 0)).x,
+            GameManager.Instance.GameCamera.ViewportToScreenPoint(new Vector3(0.5f, 0.28f, 0)).y), transform.rotation);
         newGame.name = "NewGameButton";
         newGame.transform.GetComponentInChildren<Text>().text = "New Game";
         newGame.transform.SetParent(HighScoreMenu.transform);
-
 
 //#if UNITY_EDITOR
 //        UnityEditor.Events.UnityEventTools.RegisterPersistentListener(newGame.GetComponent<Button>().onClick, 0,
@@ -169,15 +163,21 @@ public class HighScoreMenuManager : MonoBehaviour
 //            GameManager.Instance.BeginTrainingGame
 //        );
 //#endif
-        
+
         newGame.GetComponent<Button>().onClick.AddListener(DestroyHighScoreTable);
         newGame.GetComponent<Button>().onClick.AddListener(GameManager.Instance.BeginTrainingGame);
+        newGame.GetComponent<Button>().onClick.AddListener(ChangeButtons);
 
         PauseMenu.Instance.HighScoreMenuButtons[0] = newGame;
         PauseMenu.Instance.SetUsingButtons = PauseMenu.Instance.HighScoreMenuButtons;
         PauseMenu.Instance.ChangeStateOfPointers(true);
     }
 
+    private void ChangeButtons()
+    {
+        PauseMenu.Instance.SetUsingButtons = PauseMenu.Instance.PauseMenuButtons;
+    }
+    
     private GameObject CreateUIGameOverTextObject(GameObject toCreate, float x, float y, string text)
     {
         GameObject obj = Instantiate(toCreate, new Vector2(

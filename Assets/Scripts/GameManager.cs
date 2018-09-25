@@ -86,6 +86,11 @@ public class GameManager : MonoBehaviour
 
     private bool _menuOpened;
 
+    public bool InGame
+    {
+        get { return _inGame; }
+    }
+
     public bool MenuOpened
     {
         set { _menuOpened = value; }
@@ -95,6 +100,11 @@ public class GameManager : MonoBehaviour
     {
         get { return !_spacePressed; }
     }
+
+//    public bool CanPause
+//    {
+//        get { return !_spacePressed; }
+//    }
 
     public Camera GameCamera
     {
@@ -199,7 +209,8 @@ public class GameManager : MonoBehaviour
 
     private void NinjaKeyboard()
     {
-        if (Input.anyKey)
+        if (Input.anyKey && !PauseMenu.Instance.PauseMenuUI.activeSelf && !_inGame &&
+            !PauseMenu.Instance.GameMenuUI.activeSelf)
         {
             for (int i = 0; i < _gameObjects.Length; i++)
             {
@@ -218,7 +229,8 @@ public class GameManager : MonoBehaviour
 
     private void TrainingGame()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && !HighScoreMenuManager.Instance.HighScoreMenu.activeSelf && !_inGame)
+        if (Input.GetKeyDown(KeyCode.Space) && !PauseMenu.Instance.PauseMenuUI.activeSelf && !_inGame &&
+            !PauseMenu.Instance.GameMenuUI.activeSelf && !PauseMenu.Instance.HighScoreMenuUI.activeSelf)
         {
             _inGame = true;
             Destroy(_startGameText);
@@ -265,8 +277,13 @@ public class GameManager : MonoBehaviour
 
                 if (pressedWrongButton)
                 {
-                    Instantiate(BadParticles, _livesText.transform.position, Quaternion.identity).transform.parent =
+                    GameObject pressedWrongButtonParticles =
+                        Instantiate(BadParticles, _livesText.transform.position, Quaternion.identity);
+                    pressedWrongButtonParticles.transform.parent =
                         _parent.transform;
+                    var main = pressedWrongButtonParticles.GetComponent<ParticleSystem>().main;
+                    main.startSpeed = 6;
+                    main.startSize = 2;
                     LoseLife();
                 }
             }
@@ -276,8 +293,10 @@ public class GameManager : MonoBehaviour
     private void BindChars()
     {
         //Floor settings 
-        if(!_menuOpened){
-            if (Input.anyKeyDown)
+        if (!_menuOpened)
+        {
+            if (Input.anyKeyDown && !PauseMenu.Instance.PauseMenuUI.activeSelf && !_inGame &&
+                !PauseMenu.Instance.GameMenuUI.activeSelf)
             {
                 if (Input.GetKeyDown(KeyCode.Space) && !_spacePressed)
                 {
@@ -354,7 +373,8 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (Input.anyKey)
+        if (Input.anyKey && !PauseMenu.Instance.PauseMenuUI.activeSelf && !_inGame &&
+            !PauseMenu.Instance.GameMenuUI.activeSelf)
         {
             for (int i = 0; i < _gameObjects.Length; i++)
             {
@@ -466,13 +486,16 @@ public class GameManager : MonoBehaviour
 
     private void SaveCalibrationToFile()
     {
-        string[] tmp = new string[_xOfChars.Length * 2];
+        string[] tmp = new string[_xOfChars.Length * 2 + 3];
         for (int i = 0; i < _xOfChars.Length; i++)
         {
             tmp[2 * i] = _xOfChars[i] + "";
             tmp[2 * i + 1] = _yOfChars[i] + "";
         }
 
+        tmp[_xOfChars.Length * 2] = Floor.transform.localScale.x + "";
+        tmp[_xOfChars.Length * 2 + 1] = Floor.transform.position.x + "";
+        tmp[_xOfChars.Length * 2 + 2] = Floor.transform.position.y + "";
         File.WriteAllLines(CoeficientsFileName, tmp);
     }
 
@@ -485,6 +508,10 @@ public class GameManager : MonoBehaviour
             _xOfChars[i] = float.Parse(tmp[2 * i]);
             _yOfChars[i] = float.Parse(tmp[2 * i + 1]);
         }
+
+        Floor.transform.localScale = new Vector3(float.Parse(tmp[2 * _xOfChars.Length]), 1, 0);
+        Floor.transform.position =
+            new Vector3(float.Parse(tmp[2 * _xOfChars.Length + 1]), float.Parse(tmp[2 * _xOfChars.Length + 2]), 0);
     }
 
     private GameObject CreateTextObject(GameObject toCreate, float x, float y, string text)

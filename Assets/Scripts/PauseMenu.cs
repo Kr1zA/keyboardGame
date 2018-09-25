@@ -34,7 +34,7 @@ public class PauseMenu : MonoBehaviour
         PauseMenuButtons[0].SetActive(false);
         _firtsRun = true;
         PauseMenuUI.SetActive(true);
-        
+
         if (Instance != null)
         {
             Destroy(gameObject);
@@ -62,7 +62,6 @@ public class PauseMenu : MonoBehaviour
 
             if (HighScoreMenuUI.activeSelf)
             {
-              
                 _buttons[_index].GetComponent<Button>().onClick.Invoke();
                 return;
             }
@@ -97,23 +96,21 @@ public class PauseMenu : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape) && GameManager.Instance.CanPause && HighScoreMenuManager.Instance.CanPause)
+        if (Input.GetKeyDown(KeyCode.Escape) && GameManager.Instance.CanPause && HighScoreMenuManager.Instance.CanPause && !GameManager.Instance.InGame)
         {
             if (PauseMenuUI.activeSelf)
             {
-                if (GameMenuUI.activeSelf)
-                {
-                    Back();
-                }
-                else
-                {
-                    Resume();
-                }
+                Resume();
+                return;
             }
-            else
+
+            if (GameMenuUI.activeSelf)
             {
-                Pause();
+                Back();
+                return;
             }
+
+            Pause();
         }
     }
 
